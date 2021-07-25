@@ -43,4 +43,4 @@ def test_read_all_maps_from_les_file():
     path = os.path.join(os.path.dirname(__file__),
                         '../resources/TCGA-E2-A1IJ-1.les')
 
-    maps = read_all_maps_from_les_file(path=path)
+    maps = read_all_maps_from_les_file(arr=path)

@@ -5,6 +5,7 @@ import os
 import typing as tp
 from mongoengine import connect
 from common.config import get_config
+import pymongo
 
 
 def parse_mongodb_connection_string(user: str, password: str, host: str, port: str, authentication_database: tp.Optional[str] = "admin", *args, **kwargs):
@@ -40,3 +41,15 @@ def init_cached_database(connection_string: str, db_name: str):
     :rtype: [type]
     """
     return connect(host=connection_string)[db_name]
+
+
+def get_unique_patient_barcodes(col: pymongo.collection.Collection):
+    """
+    Fetches unique patient barcode values for a specific collection
+
+    :param col: databae collection handle
+    :type col: pymongo.collection.Collection
+    :return: list of unique barcode names
+    :rtype: tp.giList[str]
+    """
+    return col.find({}).distinct("bcr_patient_barcode")
