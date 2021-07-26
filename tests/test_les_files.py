@@ -1,3 +1,5 @@
+import pickle
+
 from common.les_files import *
 from loguru import logger
 import os
@@ -39,8 +41,12 @@ def test_read_les_file_data_raises_for_offset_too_small(arr):
 
 
 def test_read_all_maps_from_les_file():
-
     path = os.path.join(os.path.dirname(__file__),
                         '../resources/TCGA-E2-A1IJ-1.les')
 
     maps = read_all_maps_from_les_file(arr=path)
+    with open(os.path.join(os.path.dirname(__file__), '../resources/all_maps_TCGA-E2-A1IJ-1.pkl'), 'rb') as f:
+        gt = pickle.load(f)
+
+    assert gt[0]['header'] == maps[0]['header']
+    np.testing.assert_array_almost_equal(gt[0]['data'], maps[0]['data'])

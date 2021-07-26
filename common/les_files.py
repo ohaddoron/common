@@ -23,19 +23,20 @@ def _parse_arr(arr: tp.Union[str, bytes]):
 
 def read_les_file_header(arr: tp.Union[str, bytes], offset=0):
     """
-    Reads a "header" of a les file. The header is composed of 6 uint16 values (12 bytes) and defines a cuboid in which a lesion exists. 
+    Reads a "header" of a les file. The header is composed of 6 uint16 values (12 bytes) and defines a cuboid in
+    which a lesion exists.
     The header is 6 uint16 values defining the x, y, z position of the the lesion ROI relative to the image origins.
 
     :param arr: array of data or a path to a les file containing data to be read
     :type arr: tp.Union[str, bytes]
-    :param offset: offset value from the begining of the file defining the current segment, defaults to 0
+    :param offset: offset value from the beginning of the file defining the current segment, defaults to 0
     :type offset: int, optional
     :return: list of start end pairs ordered as (y, x, z)
     :rtype: tp.List[tp.Tuple[int, int]]
     """
     arr = _parse_arr(arr)
     arr = np.array([int.from_bytes(arr[i: i + 2], 'little', signed=False)
-                    for i in range(0, 12, 2)]).reshape(2, 3)
+                    for i in range(offset, offset + 12, 2)]).reshape(2, 3)
     assert min(arr[1] - arr[0]
                ), 'max values must be greater than min values in header'
 
@@ -53,7 +54,7 @@ def _get_data_shape(header: tp.List[tp.Tuple[int, int]]):
             header[0][1] - header[0][0] + 1)
 
 
-def read_les_file_data(arr: tp.Union[str, bytes], header: tp.List[tp.Tuple[int, int]], offset=12):
+def read_les_file_data(arr: tp.Union[str, bytes], header: tp.List[tp.Tuple[int, int]], offset: tp.Optional[int] = 12):
     """
     Reads data associated with a single header and following a specific offset. The minimal offset is 12 bytes, corresponding to the length of the first header
 
@@ -73,10 +74,13 @@ def read_les_file_data(arr: tp.Union[str, bytes], header: tp.List[tp.Tuple[int, 
 
     shape = _get_data_shape(header)
 
-    return np.array([item for item in arr[offset: offset + _get_data_length(header)]]).reshape(shape)
+    output = np.array([item for item in arr[offset: offset + _get_data_length(header)]]).reshape(shape)
+
+    output = np.transpose(output, (0, 2, 1))
+    return output
 
 
-def read_all_maps_from_les_file(arr: tp.Union[str, bytes]):
+def read_all_maps_from_les_file(arr: tp.Union[str, bytes]) -> tp.List[dict]:
     """
     Reads all segmentation maps from the provided file into a list of headers and segmentations
 
