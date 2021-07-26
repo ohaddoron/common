@@ -26,7 +26,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          apt install gcc
+          sudo apt install gcc
           pip install -U pip
           pip install -U numpy
           python -m pip install flake8 pytest
