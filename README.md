@@ -1,5 +1,5 @@
 # COMMON UTILILITIES
-
+[![Python package](https://github.com/ohaddoron/common/actions/workflows/python-package.yml/badge.svg?branch=master)](https://github.com/ohaddoron/common/actions/workflows/python-package.yml)
 - [COMMON UTILILITIES](#common-utililities)
 
 This repo contains common utilities to be used for hadnling the different database that will be encountered during the research.
