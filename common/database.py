@@ -26,7 +26,7 @@ def parse_mongodb_connection_string(user: str, password: str, host: str, port: s
     return f'mongodb://{user}:{password}@{host}:{port}/{authentication_database}'
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def init_cached_database(connection_string: str, db_name: str,
                          alias: tp.Optional[str] = None) -> pymongo.database.Database:
     """
