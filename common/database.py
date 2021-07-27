@@ -106,3 +106,37 @@ def get_dcm_dirs(bcr_patient_barcode: str, db_config: tp.Optional[str] = None) -
     """
     db = connect_to_database(db_config)
     return [item['dcm_dir'] for item in (db['dcm_files'].find({'bcr_patient_barcode': bcr_patient_barcode}))]
+
+
+def get_unique_patient_barcodes(collection_name: str, db_config: tp.Optional[dict] = None) -> tp.List[str]:
+    """
+    Fetches unique patient barcode values for a specific collection
+
+    :param collection_name: collection name to query
+    :type collection_name: str
+    :param db_config: database configuration dictionary, defaults to None
+    :type db_config: tp.Optional[str], optional
+    :return: list of unique barcode names
+    :rtype: tp.List[str]
+    """
+    db = connect_to_database(db_config)
+    col = db[collection_name]
+    return col.find({}).distinct("bcr_patient_barcode")
+
+
+def get_series_uids(collection_name: str, patient_barcode: str, db_config: tp.Optional[dict] = None) -> tp.List[str]:
+    """
+    Fetches uids for a specific patient barcode
+
+    :param collection_name: collection name to query
+    :type collection_name: str
+    :param patient_barcode: [unique identifier for a patient
+    :type patient_barcode: str
+    :return: series uids matching specific dicom images
+    :param db_config: database configuration dictionary, defaults to None
+    :type db_config: tp.Optional[str], optional
+    :rtype: tp.List[str]
+    """
+    db = connect_to_database(db_config)
+    col = db[collection_name]
+    return col.find({"bcr_patient_barcode": patient_barcode}).distinct("series_uid")

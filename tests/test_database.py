@@ -42,3 +42,12 @@ def test_get_segmentation_files():
 def test_get_dcm_dirs():
     dcm_dirs = get_dcm_dirs('TCGA-AO-A12D')
     assert isinstance(dcm_dirs, list)
+
+
+def test_get_unique_patient_barcodes():
+    assert isinstance(get_unique_patient_barcodes(collection_name='segmentation_files'), list)
+
+
+def test_get_series_uids():
+    assert isinstance(get_series_uids(collection_name='tcga_breast_radiologist_reads', patient_barcode='TCGA-AO-A12D'),
+                      list)
