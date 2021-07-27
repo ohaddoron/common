@@ -16,25 +16,25 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
     run:
-    runs-on: ubuntu-latest
-    env:
-      OS: ubuntu-latest
-      PYTHON: '3.9'
-    steps:
-    - uses: checkout@v2
-      with:
-        fetch-depth: ‘2’
+      runs-on: ubuntu-latest
+      env:
+        OS: ubuntu-latest
+        PYTHON: '3.8'
+      steps:
+      - uses: checkout@v2
+        with:
+          fetch-depth: ‘2’
 
-    - name: Setup Python
-      uses: actions/setup-python@master
-      with:
-        python-version: 3.7
-    - name: Generate Report
-      run: |
-        pip install -U pip
-        pip install coverage pytest 
-        pip install git+https://github.com/ohaddoron/common.git
-        coverage run -m pytest tests
-    - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
+      - name: Setup Python
+        uses: actions/setup-python@master
+        with:
+          python-version: 3.8
+      - name: Generate Report
+        run: |
+          pip install -U pip
+          pip install coverage pytest 
+          pip install git+https://github.com/ohaddoron/common.git
+          coverage run -m pytest tests
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v1
+        
