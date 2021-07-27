@@ -9,7 +9,7 @@ from common.loggers import TrainsLogger
 from pytorch_lightning.utilities.cli import LightningCLI
 from torch.utils.data import random_split, DataLoader
 from torchvision import transforms
-from torchvision.datasets import MNIST, FashionMNIST
+from torchvision.datasets import FashionMNIST
 
 
 class LightningTestModule(LitAutoEncoder):
