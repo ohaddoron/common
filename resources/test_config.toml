@@ -1,0 +1,16 @@
+[test]
+    test = true
+    [test.database]
+        host = "mongomock"
+        user = "mock"
+        password = "1234"
+        port = "27017"
+        authentication_database = "admin"
+        db_name = 'mock'
+
+
+
+
+
+
+    

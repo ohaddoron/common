@@ -4,3 +4,6 @@
 FashionMNIST/
 config.toml
 .idea/
+build/
+common.egg-info/
+dist/

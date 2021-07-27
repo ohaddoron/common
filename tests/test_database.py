@@ -12,9 +12,18 @@ from common.config import get_config
 from mongoengine import disconnect
 
 
-def test_parse_connection_string():
-    config = get_config(name='test')['database']
-    connection_string = parse_mongodb_connection_string(**config)
+@pytest.fixture
+def db_config():
+    return dict(host='mongomock',
+                user='mock',
+                password='1234',
+                port='27017',
+                authentication_database='admin',
+                db_name='mock')
+
+
+def test_parse_connection_string(db_config: dict):
+    connection_string = parse_mongodb_connection_string(**db_config)
     assert connection_string == 'mongodb://mock:1234@mongomock:27017/admin'
 
 
@@ -24,30 +33,6 @@ def test_init_cached_database():
     collections = db.list_collection_names()
 
 
-def test_init_cached_database_no_inputs():
-    db = init_cached_database()
-    collections = db.list_collection_names()
-
-
-def test_connect_to_database():
-    db = connect_to_database()
+def test_connect_to_database(db_config: dict):
+    db = connect_to_database(db_config=db_config)
     assert db['segmentation_files'].find().alive
-
-
-def test_get_segmentation_files():
-    segmentation_files = get_segmentation_files('TCGA-AO-A12D')
-    assert isinstance(segmentation_files, list)
-
-
-def test_get_dcm_dirs():
-    dcm_dirs = get_dcm_dirs('TCGA-AO-A12D')
-    assert isinstance(dcm_dirs, list)
-
-
-def test_get_unique_patient_barcodes():
-    assert isinstance(get_unique_patient_barcodes(collection_name='segmentation_files'), list)
-
-
-def test_get_series_uids():
-    assert isinstance(get_series_uids(collection_name='tcga_breast_radiologist_reads', patient_barcode='TCGA-AO-A12D'),
-                      list)
