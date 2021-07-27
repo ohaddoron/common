@@ -9,3 +9,4 @@ toml==0.10.2
 torch==1.9.0
 torchvision==0.10.0
 trains==0.16.4
+pytorch-lightning
