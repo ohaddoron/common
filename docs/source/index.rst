@@ -6,9 +6,13 @@
 Welcome to Common Utils's documentation!
 ========================================
 
+.. mdinclude:: ../../README.md
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   api
 
 
 
