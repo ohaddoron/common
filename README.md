@@ -1,6 +1,7 @@
 # Common Utilities
 
 [![build](https://github.com/ohaddoron/common/actions/workflows/python-package.yml/badge.svg)](https://github.com/ohaddoron/common/actions/workflows/python-package.yml)
+[![Inline docs](http://inch-ci.org/github/ohaddoron/common.svg?branch=master)](http://inch-ci.org/github/ohad/common)
 
 This repo contains common utilities to be used for handling the different database that will be encountered during the
 research.
