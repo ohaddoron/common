@@ -14,19 +14,19 @@ from common.les_files import read_all_maps_from_les_file
 
 
 class ImageMaskHandlerBase(ABC):
-    @abstractmethod
-    def read_image(self, path: str) -> sitk.Image:
+    @staticmethod
+    def read_image(path: str) -> sitk.Image:
         """
-        Reads a stack of images from the provided path, outputs [slices, width, height]
+        Reads a stack of images from the provided path, outputs [width, height, slices]
         :param path: pathway to images to read
         :type path: str
         :return: Image stack
         :rtype: sitk.Image
         """
-        ...
+        raise NotImplementedError
 
-    @abstractmethod
-    def read_masks(self, path: str, output_shape: tp.Tuple[int, int, int]) -> tp.List[sitk.Image]:
+    @staticmethod
+    def read_masks(path: str, output_shape: tp.Tuple[int, int, int]) -> tp.List[sitk.Image]:
         """
         Reads all masks from the provided path into a list of SimpleITK images
 
@@ -37,10 +37,10 @@ class ImageMaskHandlerBase(ABC):
         :return: list of SimpleITK images
         :rtype: List[sitk.Image]
         """
-        ...
+        raise NotImplementedError
 
-    @abstractmethod
-    def read_image_and_mask(self, path_to_images: str, path_to_mask: str) -> tp.Tuple[sitk.Image, tp.List[sitk.Image]]:
+    @classmethod
+    def read_image_and_mask(cls, path_to_images: str, path_to_mask: str) -> tp.Tuple[sitk.Image, tp.List[sitk.Image]]:
         """
         Reads both image and related segmentation masks
         :param path_to_images: pathway to images to read
@@ -49,7 +49,7 @@ class ImageMaskHandlerBase(ABC):
         :type path_to_mask: str
         :return:
         """
-        ...
+        raise NotImplementedError
 
     @staticmethod
     def overlay_mask_on_image(image: sitk.Image, mask: sitk.Image) -> PIL.Image.Image:
@@ -58,11 +58,13 @@ class ImageMaskHandlerBase(ABC):
 
 class LESImageMaskHandler(ImageMaskHandlerBase):
 
-    def read_image(self, path: str) -> sitk.Image:
+    @staticmethod
+    def read_image(path: str) -> sitk.Image:
         assert os.path.isdir(path), 'Provided path must be of a directory containing dicom images'
-        return sitk.GetImageFromArray(read_dicom_images(path).transpose((1, 2, 0)))
+        return sitk.GetImageFromArray(read_dicom_images(path))
 
-    def read_masks(self, path: str, output_shape: tp.Tuple[int, int, int]) -> tp.List[sitk.Image]:
+    @staticmethod
+    def read_masks(path: str, output_shape: tp.Tuple[int, int, int]) -> tp.List[sitk.Image]:
         seg_maps = read_all_maps_from_les_file(path)
 
         masks = []
@@ -75,16 +77,17 @@ class LESImageMaskHandler(ImageMaskHandlerBase):
 
         return masks
 
-    def read_image_and_mask(self, path_to_images: str, path_to_mask: str) -> tp.Tuple[sitk.Image, tp.List[sitk.Image]]:
-        image = self.read_image(path_to_images)
-        masks = self.read_masks(path_to_mask, image.GetSize())
+    @classmethod
+    def read_image_and_masks(cls, path_to_images: str, path_to_mask: str) -> tp.Tuple[sitk.Image, tp.List[sitk.Image]]:
+        image = cls.read_image(path_to_images)
+        masks = cls.read_masks(path_to_mask, image.GetSize()[::-1])
         return image, masks
 
     @staticmethod
     def overlay_mask_on_image(image: sitk.Image, mask: sitk.Image, alpha: float = 0.6, slice=0) -> PIL.Image.Image:
-        image = sitk.GetArrayFromImage(image)[..., slice]
+        image = sitk.GetArrayFromImage(image)[slice]
         image = 255. * (image / image.max())
-        mask = sitk.GetArrayFromImage(mask).transpose((1, 2, 0))[..., slice] * 255
+        mask = sitk.GetArrayFromImage(mask)[slice] * 255
 
         image = np.array(Image.fromarray(image).convert('RGB'))
 
