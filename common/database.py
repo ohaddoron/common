@@ -1,8 +1,11 @@
 import typing as tp
 from functools import lru_cache
+from uuid import uuid4
 
+import motor
 import pymongo.database
 from mongoengine import connect
+import motor.motor_asyncio
 
 
 def parse_mongodb_connection_string(user: str, password: str, host: str, port: str,
@@ -28,7 +31,8 @@ def parse_mongodb_connection_string(user: str, password: str, host: str, port: s
 
 @lru_cache(maxsize=128)
 def init_cached_database(connection_string: str, db_name: str,
-                         alias: tp.Optional[str] = None) -> pymongo.database.Database:
+                         alias: tp.Optional[str] = None, async_flag=False) -> tp.Union[
+    pymongo.database.Database, motor.MotorDatabase]:
     """
     initializes a cahced handle to the mongodb database
 
@@ -40,7 +44,10 @@ def init_cached_database(connection_string: str, db_name: str,
     :rtype: :class:`pymongo.database.Database`
     """
 
-    return connect(host=connection_string, alias=alias)[db_name]
+    if not async_flag:
+        return connect(host=connection_string, alias=alias)[db_name]
+    else:
+        return motor.motor_asyncio.AsyncIOMotorClient(host=connection_string)[db_name]
 
 
 def connect_to_database(db_config: dict) -> pymongo.database.Database:
@@ -57,3 +64,12 @@ def connect_to_database(db_config: dict) -> pymongo.database.Database:
     """
     return init_cached_database(parse_mongodb_connection_string(
         **db_config), db_name=db_config['db_name'])
+
+
+@lru_cache
+def init_database(config_name: str, async_flag: bool = False):
+    from common.config import get_config
+    config = get_config(name=config_name)
+    db = init_cached_database(parse_mongodb_connection_string(
+        **config), db_name=config['db_name'], async_flag=async_flag)
+    return db
