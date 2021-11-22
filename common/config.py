@@ -17,7 +17,7 @@ def get_config(config_path: tp.Optional[str] = None, name: tp.Optional[str] = No
     :rtype: dict
     """
     config_path = config_path or os.path.join(
-        os.path.dirname(__file__), '../config.toml')
+        os.getcwd(), '../config.toml')
     with open(config_path) as f:
         config = toml.load(f)
     if name:

@@ -32,7 +32,7 @@ def parse_mongodb_connection_string(user: str, password: str, host: str, port: s
 @lru_cache(maxsize=128)
 def init_cached_database(connection_string: str, db_name: str,
                          alias: tp.Optional[str] = None, async_flag=False) -> tp.Union[
-    pymongo.database.Database, motor.MotorDatabase]:
+    pymongo.database.Database]:
     """
     initializes a cahced handle to the mongodb database
 
