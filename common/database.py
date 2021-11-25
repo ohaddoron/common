@@ -1,5 +1,7 @@
+import os
 import typing as tp
 from functools import lru_cache
+from pathlib import Path
 from uuid import uuid4
 
 import motor
@@ -67,9 +69,10 @@ def connect_to_database(db_config: dict) -> pymongo.database.Database:
 
 
 @lru_cache
-def init_database(config_name: str, async_flag: bool = False):
+def init_database(config_name: str, async_flag: bool = False, config_path=None):
     from common.config import get_config
-    config = get_config(name=config_name)
+    config_path = config_path or Path(os.getcwd(), '../config.toml').as_posix()
+    config = get_config(config_path=config_path, name=config_name)
     db = init_cached_database(parse_mongodb_connection_string(
         **config), db_name=config['db_name'], async_flag=async_flag)
     return db
