@@ -76,3 +76,55 @@ def init_database(config_name: str, async_flag: bool = False, config_path=None):
     db = init_cached_database(parse_mongodb_connection_string(
         **config), db_name=config['db_name'], async_flag=async_flag)
     return db
+
+
+def fetch_collection_as_table(col: str, patients: tp.List[str] = None, **params):
+    db = init_database(**params)
+
+    return db[col].aggregate([
+        {
+            "$match": {
+                "patient": {"$in": patients}
+            }
+        } if patients else {"$match": {}},
+        {
+            '$group': {
+                '_id': '$sample',
+                'data': {
+                    '$push': {
+                        'k': '$name',
+                        'v': '$value'
+                    }
+                },
+                'patient': {
+                    '$push': '$patient'
+                }
+            }
+        }, {
+            '$project': {
+                'patient': {
+                    '$arrayElemAt': [
+                        '$patient', 0
+                    ]
+                },
+                'sample': '$_id',
+                '_id': 0,
+                'data': {
+                    '$arrayToObject': '$data'
+                }
+            }
+        }, {
+            '$replaceRoot': {
+                'newRoot': {
+                    '$mergeObjects': [
+                        '$$ROOT', '$data'
+                    ]
+                }
+            }
+        }, {
+            '$project': {
+                'data': 0
+            }
+        }
+    ],
+        allowDiskUse=True)

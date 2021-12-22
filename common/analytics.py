@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-from common.client import get_patients_by_mutation
+from common.fetcher_client import get_patients_by_mutation
 from common.fetcher_client import get_patients_age, get_features_for_patients, get_feature_names
 import typing as tp
 
