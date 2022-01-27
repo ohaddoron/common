@@ -1,6 +1,8 @@
 from functools import lru_cache
 import typing as tp
 import os
+from pathlib import Path
+
 import toml
 
 
@@ -17,7 +19,7 @@ def get_config(config_path: tp.Optional[str] = None, name: tp.Optional[str] = No
     :rtype: dict
     """
     config_path = config_path or os.path.join(
-        os.getcwd(), '../config.toml')
+        Path(__file__).parent, '../config.toml')
     with open(config_path) as f:
         config = toml.load(f)
     if name:
