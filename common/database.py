@@ -45,7 +45,7 @@ def init_cached_database(connection_string: str, db_name: str,
     :return: database handle
     :rtype: :class:`pymongo.database.Database`
     """
-
+    alias = alias or db_name
     if not async_flag:
         return connect(host=connection_string, alias=alias)[db_name]
     else:
