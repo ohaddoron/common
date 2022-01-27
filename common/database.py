@@ -45,7 +45,7 @@ def init_cached_database(connection_string: str, db_name: str,
     :return: database handle
     :rtype: :class:`pymongo.database.Database`
     """
-    alias = alias or db_name
+    alias = alias or uuid4().hex
     if not async_flag:
         return connect(host=connection_string, alias=alias)[db_name]
     else:
@@ -71,7 +71,7 @@ def connect_to_database(db_config: dict) -> pymongo.database.Database:
 @lru_cache
 def init_database(config_name: str, async_flag: bool = False, config_path=None):
     from common.config import get_config
-    config_path = config_path or Path(os.getcwd(), '../config.toml').as_posix()
+    config_path = config_path or Path(Path(__file__).parent, '../config.toml').as_posix()
     config = get_config(config_path=config_path, name=config_name)
     db = init_cached_database(parse_mongodb_connection_string(
         **config), db_name=config['db_name'], async_flag=async_flag)
