@@ -3,7 +3,7 @@ import typing as tp
 from functools import lru_cache
 from pathlib import Path
 from uuid import uuid4
-
+from loguru import logger
 import motor
 import pymongo.database
 from mongoengine import connect
@@ -34,7 +34,7 @@ def parse_mongodb_connection_string(user: str, password: str, host: str, port: s
 @lru_cache(maxsize=128)
 def init_cached_database(connection_string: str, db_name: str,
                          alias: tp.Optional[str] = None, async_flag=False) -> tp.Union[
-    pymongo.database.Database]:
+    pymongo.database.Database, motor.motor_asyncio.AsyncIOMotorDatabase]:
     """
     initializes a cahced handle to the mongodb database
 
@@ -47,7 +47,10 @@ def init_cached_database(connection_string: str, db_name: str,
     """
     alias = alias or uuid4().hex
     if not async_flag:
-        return connect(host=connection_string, alias=alias)[db_name]
+        client = connect(host=connection_string, alias=alias)
+        logger.debug(client.server_info())
+        return client[db_name]
+
     else:
         return motor.motor_asyncio.AsyncIOMotorClient(host=connection_string)[db_name]
 
